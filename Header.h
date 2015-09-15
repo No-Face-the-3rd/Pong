@@ -15,5 +15,6 @@ struct Ball
 
 struct PowerUp
 {
-	
+	float x, y,size, duration, effectDur;
+	char effect;
 };

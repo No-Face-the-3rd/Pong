@@ -1,17 +1,17 @@
-﻿Build started 9/14/2015 2:08:19 PM.
+﻿Build started 9/14/2015 5:15:57 PM.
      1>Project "C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Pong\Pong.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Source.cpp
          Source.cpp
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(81): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(104): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(105): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(106): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(107): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(108): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(120): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(121): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(127): warning C4305: 'initializing': truncation from 'double' to 'float'
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(84): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(136): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(137): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(138): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(139): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(140): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(152): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(153): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(159): warning C4305: 'initializing': truncation from 'double' to 'float'
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Debug\Pong.exe" /INCREMENTAL /NOLOGO SFW.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Debug\Pong.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Debug\Pong.lib" /MACHINE:X86 Debug\Source.obj
          SFW.lib
@@ -20,4 +20,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.31
+Time Elapsed 00:00:00.57

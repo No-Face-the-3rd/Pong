@@ -3,13 +3,15 @@
 #include <cmath>
 #include <time.h>
 
-void drawMenu(float screenH,float screenW, Player &selector);
+void drawMenu(float screenH,float screenW, Player &selector,PowerUp pTypes[]);
 void drawChar(char test, float x, float y, float size);
 void drawPaddle(Player player);
 void drawBall(Ball &ball);
 void updatePlayer(Player &player, int playerNum, int screenH);
 void updateSelector(Player &selector,float loc[],int &timer);
-void drawPowerup(PowerUp pList[]);
+void drawPowerup(PowerUp pUp);
+void initPowerUps(PowerUp pUp[],int size);
+void initPowerUpTypes(PowerUp pUp[], int size);
 
 
 int main()
@@ -20,12 +22,19 @@ int main()
 
 	Player selector{ 0,screenW / 2.0f + 4.0f*(screenH / 20.0f / 2.0f + 5.0f),screenH / 2.0f,0.0f,15.0f,20.0f };
 
+	PowerUp powerUps[5];
+	initPowerUpTypes(powerUps,5);
+	
+	PowerUp pList[6];
+	initPowerUps(pList,6);
+	
+
 	sfw::initContext(screenW, screenH, "Wheel Pong");
 	Player player1{ lives,dfWidth/1.25f,(float)screenH / 2.0f,dfPspeed,dfWidth,dfHeight };
 	Player player2{ lives,(float)screenW - dfWidth/1.25f,(float)screenH / 2.0f ,dfPspeed,dfWidth,dfHeight };
 	
 
-	drawMenu((float)screenH,(float)screenW,selector);
+	drawMenu((float)screenH,(float)screenW,selector,powerUps);
 
 	while (sfw::stepContext())
 	{
@@ -41,8 +50,8 @@ int main()
 		updatePlayer(player1, 1, screenH);
 		updatePlayer(player2, 2, screenH);
 
-		drawChar(1, screenW / 2.0f, screenH / 2.0f, screenH / 20.0f);
-		drawChar('g', screenW / 2.0f + screenW/30.0f, screenH / 2.0f, screenH / 20.0f);
+		//drawChar(1, screenW / 2.0f, screenH / 2.0f, screenH / 20.0f);
+		//drawChar('B', screenW / 2.0f + screenW/30.0f, screenH / 2.0f, screenH / 20.0f);
 		if (ball.y > (float)screenH - ball.radius - 5.0f) 
 		{
 			ball.y = (float)screenH - ball.radius - 5.0f;
@@ -81,7 +90,7 @@ int main()
 
 
 		if (player1.lives <= 0 || player2.lives <= 0)
-			drawMenu(screenH,screenW,selector);
+			drawMenu(screenH,screenW,selector,powerUps);
 		if (selector.lives == 2)
 			break;
 	}
@@ -89,8 +98,38 @@ int main()
 	return 0;
 }
 
-void drawPowerup(PowerUp pList[])
+void initPowerUpTypes(PowerUp pUp[], int size)
 {
+	pUp[0].effect = 'I';
+	pUp[1].effect = 'B';
+	pUp[2].effect = 'L';
+	pUp[3].effect = 'S';
+	pUp[4].effect = 'F';
+}
+
+void initPowerUps(PowerUp pUp[],int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		pUp[i].x = 0;
+		pUp[i].y = 0;
+		pUp[i].size = 0;
+		pUp[i].duration = 1000;
+		pUp[i].effectDur = 500;
+	}
+
+
+	return;
+}
+
+void drawPowerup(PowerUp pUp)
+{
+	sfw::drawCircle(pUp.x, pUp.y, pUp.size);
+	drawChar(pUp.effect, pUp.x, pUp.y, pUp.size*3.0f / 4.0f);
+	if(pUp.duration > 0)
+		pUp.duration -= 0.16;
+	if (pUp.effectDur > 0)
+		pUp.effectDur -= 0.16;
 
 }
 
@@ -174,6 +213,13 @@ void drawChar(char test, float x, float y, float size)
 		sfw::drawLine(x + size / 4.0f, y + size / 2.0f, x, y - size / 2.0f);
 		sfw::drawLine(x - size / 8.0f, y, x + size / 8.0f, y);
 		break;
+	case 'b':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x, y);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 80)*toRad)*size / 4.0f);
+		break;
 	case 'B':
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x, y - size / 2.0f);
@@ -184,6 +230,31 @@ void drawChar(char test, float x, float y, float size)
 			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 80)*toRad)*size / 4.0f);
 			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y - size / 4.0f + sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y - size / 4.0f + sin((i - 80)*toRad)*size / 4.0f);
 		}
+		break;
+	case 'c':
+		sfw::drawLine(x, y, x + size / 4.0f, y);
+		sfw::drawLine(x, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i + 90)*toRad)*size / 4.0f, y + size / 4.0f + sin((i + 90)*toRad)*size / 4.0f, x + cos((i + 100)*toRad)*size / 4.0f, y + size / 4.0f + sin((i + 100)*toRad)*size / 4.0f);
+		break;
+	case 'C':
+		sfw::drawLine(x, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		sfw::drawLine(x, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i + 90)*toRad)*size / 4.0f, y + sin((i + 90)*toRad)*size / 2.0f, x + cos((i + 100)*toRad)*size / 4.0f, y + sin((i + 100)*toRad)*size / 2.0f);
+		break;
+	case 'd':
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x, y, x + size / 4.0f, y);
+		for (int i = 0; i < 270; i += 10)
+			sfw::drawLine(x + cos((i + 90)*toRad)*size / 4.0f, y + size / 4.0f - sin((i + 90)*toRad)*size / 4.0f, x + cos((i + 100)*toRad)*size / 4.0f, y + size / 4.0f - sin((i + 100)*toRad)*size / 4.0f);
+		break;
+	case 'D':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x, y - size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y - sin((i - 90)*toRad)*size / 2.0f, x + cos((i - 80)*toRad)*size / 4.0f, y - sin((i - 80)*toRad)*size / 2.0f);
 		break;
 	case 'e':
 		sfw::drawLine(x - size / 4.0f, y + size / 4.0f, x + size / 4.0f, y + size / 4.0f);
@@ -197,6 +268,12 @@ void drawChar(char test, float x, float y, float size)
 		sfw::drawLine(x - size / 4.0f, y, x, y);
 		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
 		break;
+	case 'f':
+		sfw::drawLine(x, y - size / 4.0f, x, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + size / 8.0f + cos(i*toRad)*size / 8.0f, y - size / 4.0f - sin(i *toRad)*size / 4.0f, x + size / 8.0f + cos((i + 10)*toRad)*size / 8.0f, y - size / 4.0f - sin((i + 10)*toRad)*size / 4.0f);
+		break;
 	case 'F':
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
@@ -208,16 +285,58 @@ void drawChar(char test, float x, float y, float size)
 		for (int i = 0; i < 180; i += 10)
 			sfw::drawLine(x+cos(i*toRad)*size/4.0f,y+size*3.0f/4.0f + sin(i*toRad)*size/4.0f, x + cos((i+10)*toRad)*size / 4.0f, y + size*3.0f / 4.0f + sin((i + 10)*toRad)*size / 4.0f);
 		break;
+	case 'G':
+		sfw::drawLine(x, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		sfw::drawLine(x, y, x + size / 4.0f, y);
+		sfw::drawLine(x, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y, x + size / 4.0f, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i + 90)*toRad)*size / 4.0f, y - sin((i + 90)*toRad)*size / 2.0f, x + cos((i + 100)*toRad)*size / 4.0f, y - sin((i + 100)*toRad)*size / 2.0f);
+		break;
 	case 'h':
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x + size / 4.0f, y + size / 8.0f, x + size / 4.0f, y + size / 2.0f);
 		for (int i = 0; i < 180; i += 10)
 			sfw::drawLine(x + cos(i* toRad)*(size / 4.0f), y + (size / 8.0f) - sin(i*toRad)*(size / 8.0f), x + cos((i + 10)*toRad)*(size / 4.0f), y + (size / 8.0f) - sin((i + 10)*toRad)*(size / 8.0f));
 		break;
+	case 'H':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y);
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		break;
+	case 'i':
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x, y, x, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x, y);
+		sfw::drawLine(x, y - size*3.0f / 8.0f, x, y - size / 8.0f);
+		break;
 	case 'I':
 		sfw::drawLine(x, y + size / 2.0f, x, y - size / 2.0f);
 		sfw::drawLine(x + size / 4.0f, y + size / 2.0f, x - size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x - size / 4.0f, y - size / 2.0f);
+		break;
+	case 'j':
+		sfw::drawLine(x, y, x, y + size *3.0f/ 4.0f);
+		sfw::drawLine(x - size / 4.0f, y, x, y);
+		sfw::drawLine(x, y - size*3.0f / 8.0f, x, y - size / 8.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x - size / 8.0f + cos((i + 180)*toRad)*size / 8.0f, y + size*3.0f / 4.0f - sin((i + 180)*toRad)*size / 8.0f, x - size / 8.0f + cos((i + 190)*toRad)*size / 8.0f, y + size*3.0f / 4.0f - sin((i + 190)*toRad)*size / 8.0f);
+		break;
+	case 'J':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x + size / 4.0f, y + size / 4.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i + 180)*toRad)*size / 4.0f, y + size / 4.0f - sin((i + 180)*toRad)*size / 4.0f, x + cos((i + 190)*toRad)*size / 4.0f, y + size / 4.0f - sin((i + 190)*toRad)*size / 4.0f);
+		break;
+	case 'k':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y - size / 4.0f);
+		break;
+	case 'K':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y - size / 2.0f);
 		break;
 	case 'l':
 		sfw::drawLine(x, y - size / 2.0f, x, y + size / 2.0f);
@@ -228,18 +347,51 @@ void drawChar(char test, float x, float y, float size)
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
 		break;
+	case 'm':
+		sfw::drawLine(x - size / 4.0f, y + size / 8.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x, y + size / 8.0f, x, y + size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y + size / 8.0f, x + size / 4.0f, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+		{
+			sfw::drawLine(x - size / 8.0f + cos(i*toRad)*size / 8.0f, y + size / 8.0f - sin(i*toRad)*size / 8.0f, x - size / 8.0f + cos((i + 10)*toRad)*size / 8.0f, y + size / 8.0f - sin((i + 10)*toRad)*size / 8.0f);
+			sfw::drawLine(x + size / 8.0f + cos(i*toRad)*size / 8.0f, y + size / 8.0f - sin(i*toRad)*size / 8.0f, x + size / 8.0f + cos((i + 10)*toRad)*size / 8.0f, y + size / 8.0f - sin((i + 10)*toRad)*size / 8.0f);
+		}
+		break;
+	case 'M':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x, y);
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x, y);
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		break;
 	case 'n':
 		sfw::drawLine(x - size / 4.0f, y, x - size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x + size / 4.0f, y + size / 8.0f, x + size / 4.0f, y + size / 2.0f);
 		for (int i = 0; i < 180; i += 10)
 			sfw::drawLine(x + cos(i* toRad)*(size / 4.0f), y + (size / 8.0f) - sin(i*toRad)*(size / 8.0f), x + cos((i + 10)*toRad)*(size / 4.0f), y + (size / 8.0f) - sin((i + 10)*toRad)*(size / 8.0f));
 		break;
+	case 'N':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		break;
 	case 'o':
 		sfw::drawCircle(x, y + size / 4.0f, size / 4.0f);
 		break;
 	case 'O':
-		for (int i = 0; i < 360; i += 10)
-			sfw::drawLine(x + cos(i*toRad)*size / 4.0f, y + sin(i*toRad)*size / 2.0f, x + cos((i + 10)*toRad)*size / 4.0f, y + sin((i + 10)*toRad)*size / 2.0f);
+		sfw::drawLine(x - size / 16.0f, y + size / 2.0f, x + size / 16.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 16.0f, y - size / 2.0f, x + size / 16.0f, y - size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+		{
+			sfw::drawLine(x + size / 16.0f + cos((i - 90)*toRad)*size *3.0f / 16.0f, y - sin((i - 90)*toRad)*size / 2.0f, x + size / 16.0f + cos((i - 80)*toRad)*size*3.0f / 16.0f, y - sin((i - 80)*toRad)*size / 2.0f);
+			sfw::drawLine(x - size / 16.0f + cos((i + 90)*toRad)*size *3.0f / 16.0f, y - sin((i + 90)*toRad)*size / 2.0f, x - size / 16.0f + cos((i + 100)*toRad)*size*3.0f / 16.0f, y - sin((i + 100)*toRad)*size / 2.0f);
+		}
+		break;
+	case 'p':
+		sfw::drawLine(x - size / 4.0f, y, x - size / 4.0f, y + size);
+		sfw::drawLine(x - size / 4.0f, y, x, y);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y + size / 4.0f - sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y + size / 4.0f - sin((i - 80)*toRad)*size / 4.0f);
 		break;
 	case 'P':
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
@@ -247,6 +399,44 @@ void drawChar(char test, float x, float y, float size)
 		sfw::drawLine(x - size / 4.0f, y, x, y);
 		for (int i = 0; i < 180; i += 10)
 			sfw::drawLine(x + cos((i + 270)*toRad)*(size / 4.0f), y - (size / 4.0f) - sin((i + 270)*toRad)*(size / 4.0f), x + cos((i + 280)*toRad)*(size / 4.0f), y - (size / 4.0f) - sin((i + 280)*toRad)*(size / 4.0f));
+		break;
+	case 'q':
+		sfw::drawLine(x + size / 4.0f, y + size / 4.0f, x + size / 4.0f, y + size*3.0f / 4.0f);
+		sfw::drawCircle(x, y + size / 4.0f, size / 4.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + size *3.0f / 8.0f + cos(i*toRad)*size / 8.0f, y + size*3.0f / 4.0f + sin(i*toRad)*size / 8.0f, x + size *3.0f / 8.0f + cos((i + 10)*toRad)*size / 8.0f, y + size*3.0f / 4.0f + sin((i + 10)*toRad)*size / 8.0f);
+		break;
+	case 'Q':
+		sfw::drawLine(x - size / 16.0f, y + size / 2.0f, x + size / 16.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 16.0f, y - size / 2.0f, x + size / 16.0f, y - size / 2.0f);
+		sfw::drawLine(x + size / 8.0f, y + size / 4.0f, x + size / 4.0f, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+		{
+			sfw::drawLine(x + size / 16.0f + cos((i - 90)*toRad)*size *3.0f / 16.0f, y - sin((i - 90)*toRad)*size / 2.0f, x + size / 16.0f + cos((i - 80)*toRad)*size*3.0f / 16.0f, y - sin((i - 80)*toRad)*size / 2.0f);
+			sfw::drawLine(x - size / 16.0f + cos((i + 90)*toRad)*size *3.0f / 16.0f, y - sin((i + 90)*toRad)*size / 2.0f, x - size / 16.0f + cos((i + 100)*toRad)*size*3.0f / 16.0f, y - sin((i + 100)*toRad)*size / 2.0f);
+		}
+		break;
+	case 'r':
+		sfw::drawLine(x - size / 4.0f, y, x - size / 4.0f, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos(i* toRad)*(size / 4.0f), y + (size / 8.0f) - sin(i*toRad)*(size / 8.0f), x + cos((i + 10)*toRad)*(size / 4.0f), y + (size / 8.0f) - sin((i + 10)*toRad)*(size / 8.0f));
+		break;
+	case 'R':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x, y);
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x, y - size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i + 270)*toRad)*(size / 4.0f), y - (size / 4.0f) - sin((i + 270)*toRad)*(size / 4.0f), x + cos((i + 280)*toRad)*(size / 4.0f), y - (size / 4.0f) - sin((i + 280)*toRad)*(size / 4.0f));
+		break;
+	case 's':
+		sfw::drawLine(x, y, x + size / 4.0f, y);
+		sfw::drawLine(x, y + size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+		{
+			sfw::drawLine(x + cos((i + 90)*toRad)*(size / 4.0f), y + (size / 8.0f) - sin((i + 90)*toRad)*(size / 8.0f), x + cos((i + 100)*toRad)*(size / 4.0f), y + (size / 8.0f) - sin((i + 100)*toRad)*(size / 8.0f));
+			sfw::drawLine(x + cos((i + 270)*toRad)*(size / 4.0f), y + (size *3.0f / 8.0f) - sin((i + 270)*toRad)*(size / 8.0f), x + cos((i + 280)*toRad)*(size / 4.0f), y + (size *3.0f / 8.0f) - sin((i + 280)*toRad)*(size / 8.0f));
+		}
 		break;
 	case 'S':
 		sfw::drawLine(x, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
@@ -257,9 +447,36 @@ void drawChar(char test, float x, float y, float size)
 			sfw::drawLine(x + cos((i + 270)*toRad)*(size / 4.0f), y + (size / 4.0f) - sin((i + 270)*toRad)*(size / 4.0f), x + cos((i + 280)*toRad)*(size / 4.0f), y + (size / 4.0f) - sin((i + 280)*toRad)*(size / 4.0f));
 		}
 		break;
+	case 't':
+		sfw::drawLine(x, y - size / 2.0f, x, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y);
+		sfw::drawLine(x, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + size / 8.0f + cos((i + 180)*toRad)*size / 8.0f, y + size*3.0f / 8.0f - sin((i + 180)*toRad)*size / 8.0f, x + size / 8.0f + cos((i + 190)*toRad)*size / 8.0f, y + size*3.0f / 8.0f - sin((i + 190)*toRad)*size / 8.0f);
+		break;
 	case 'T':
 		sfw::drawLine(x, y - size / 2.0f, x, y + size / 2.0f);
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		break;
+	case 'u':
+		sfw::drawLine(x + size / 4.0f, y, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y, x - size / 4.0f, y + size*3.0f / 8.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i + 180)*toRad)*size / 4.0f, y + size*3.0f / 8.0f - sin((i + 180)*toRad)*size / 8.0f, x + cos((i + 190)*toRad)*size / 4.0f, y + size*3.0f / 8.0f - sin((i + 190)*toRad)*size / 8.0f);
+		break;
+	case 'U':
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size*3.0f / 8.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i + 180)*toRad)*size / 4.0f, y + size*3.0f / 8.0f - sin((i + 180)*toRad)*size / 8.0f, x + cos((i + 190)*toRad)*size / 4.0f, y + size*3.0f / 8.0f - sin((i + 190)*toRad)*size / 8.0f);
+		break;
+	case 'v':
+		sfw::drawLine(x - size / 4.0f, y, x, y + size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y, x, y + size / 2.0f);
+		break;
+	case 'V':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x, y + size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x, y + size / 2.0f);
 		break;
 	case 'w':
 		sfw::drawLine(x - size / 4.0f, y , x - size / 8.0f, y + size / 2.0f);
@@ -273,9 +490,36 @@ void drawChar(char test, float x, float y, float size)
 		sfw::drawLine(x, y, x + size / 8.0f, y + size / 2.0f);
 		sfw::drawLine(x + size / 8.0f, y + size / 2.0f, x + size / 4.0f, y - size / 2.0f);
 		break;
+	case 'x':
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y);
+		break;
 	case 'X':
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		break;
+	case 'y':
+		sfw::drawLine(x - size / 4.0f, y, x, y + size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y, x - size / 4.0f, y + size);
+		break;
+	case 'Y':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x, y);
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x, y);
+		sfw::drawLine(x, y, x, y + size / 2.0f);
+		break;
+	case 'z':
+		sfw::drawLine(x - size / 4.0f, y, x + size/4.0f, y);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y, x - size / 4.0f, y + size / 2.0f);
+		break;
+	case 'Z':
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
+		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
+		break;
+	case 0:
+		for (int i = 0; i < 360; i += 10)
+			sfw::drawLine(x + cos(i*toRad)*size / 4.0f, y + sin(i*toRad)*size / 2.0f, x + cos((i + 10)*toRad)*size / 4.0f, y + sin((i + 10)*toRad)*size / 2.0f);
 		break;
 	case 1:
 		sfw::drawLine(x, y - size / 2.0f, x, y + size / 2.0f);
@@ -288,17 +532,71 @@ void drawChar(char test, float x, float y, float size)
 		for (int i = 0; i < 180; i += 10)
 			sfw::drawLine(x + cos(i*toRad)*size / 4.0f, y - size*3.0f / 8.0f - sin(i*toRad)*size / 8.0f, x + cos((i + 10)*toRad)*size / 4.0f, y - size*3.0f / 8.0f - sin((i + 10)*toRad)*size / 8.0f);
 		break;
+	case 3:
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x, y - size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+		{
+			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 80)*toRad)*size / 4.0f);
+			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y - size / 4.0f + sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y - size / 4.0f + sin((i - 80)*toRad)*size / 4.0f);
+		}
+		break;
+	case 4:
+		sfw::drawLine(x, y - size / 2.0f, x, y + size / 2.0f);
+		sfw::drawLine(x, y - size / 2.0f, x - size / 4.0f, y);
+		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y);
+		break;
+	case 5:
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y);
+		sfw::drawLine(x - size / 4.0f, y, x, y);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x, y + size / 2.0f);
+		for (int i = 0; i < 180; i += 10)
+			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 80)*toRad)*size / 4.0f);
+		break;
+	case 6:
+		sfw::drawCircle(x, y + size / 4.0f, size / 4.0f);
+		sfw::drawLine(x - size / 4.0f, y - size / 4.0f, x - size / 4.0f, y + size / 4.0f);
+		sfw::drawLine(x, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		for (int i = 0; i < 90; i += 10)
+			sfw::drawLine(x + cos((i + 90)*toRad)*size / 4.0f, y - size / 4.0f - sin((i + 90)*toRad)*size / 4.0f, x + cos((i + 100)*toRad)*size / 4.0f, y - size / 4.0f - sin((i + 100)*toRad)*size / 4.0f);
+		break;
+	case 7:
+		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y - size / 2.0f);
+		break;
+	case 8:
+		sfw::drawCircle(x, y + size / 4.0f, size / 4.0f);
+		sfw::drawCircle(x, y - size / 4.0f, size / 4.0f);
+		break;
+	case 9:
+		sfw::drawCircle(x, y - size / 4.0f, size / 4.0f);
+		sfw::drawLine(x + size / 4.0f, y + size / 4.0f, x + size / 4.0f, y - size / 4.0f);
+		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x, y + size / 2.0f);
+		for (int i = 0; i < 90; i += 10)
+			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y + size / 4.0f - sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y + size / 4.0f - sin((i - 80)*toRad)*size / 4.0f);
+		break;
 	}
 	return;
 }
 
-void drawMenu(float screenH, float screenW,Player &selector)
+void drawMenu(float screenH, float screenW,Player &selector,PowerUp pTypes[])
 {
 	float gap = 5.0f, size = screenH / 20.0f, loc[3] = { screenH / 2.0f,screenH*2.0f / 3.0f,screenH - (size + 5) };
 	int timer = 0;
 	while (sfw::stepContext())
 	{
 		drawPaddle(selector);
+		for (int i = 0; i < 5; i++)
+		{
+			pTypes[i].size = screenH / 28.0f;
+			pTypes[i].x = pTypes[i].size + 10.0f;
+			pTypes[i].y = (i+1.0f)*screenH / 6.0f;
+			drawPowerup(pTypes[i]);
+		}
+
+
+
 
 		updateSelector(selector, loc,timer);
 
@@ -322,7 +620,7 @@ void drawMenu(float screenH, float screenW,Player &selector)
 		drawChar('X', screenW / 2.0f - gap / 2.0f - size / 4.0f, screenH - (size + 5), size);
 		drawChar('I', screenW / 2.0f + gap / 2.0f + size / 4.0f, screenH - (size + 5), size);
 		drawChar('T', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 4.0f, screenH - (size + 5), size);
-		if (sfw::getKey(' ') && selector.lives == 2)
+		if (sfw::getKey(' '))
 		{
 			if (selector.lives == 2)
 			{

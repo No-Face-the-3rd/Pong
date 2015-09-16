@@ -201,7 +201,7 @@ void updatePlayer(Player &player, int playerNum, int screenH,int screenW,Ball ba
 			if (trajectory > screenH)
 				trajectory = screenH - (abs((screenW - ball.x) / ball.xVel) - abs((screenH - ball.y) / ball.yVel))*-ball.yVel + (rand() % 100 - 50);
 			else if (trajectory < 0)
-				trajectory = (abs((screenW - ball.x) / ball.xVel) - abs((ball.y) / ball.yVel))*-ball.yVel - (rand() % 100 - 50);
+				trajectory = (abs((screenW - ball.x) / ball.xVel) - abs((ball.y) / ball.yVel))*ball.yVel - (rand() % 100 - 50);
 			if (!(trajectory <= screenH && trajectory >= 0))
 				trajectory = screenH / 2.0f;
 			if (trajectory <= screenH && trajectory >= 0)

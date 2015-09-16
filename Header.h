@@ -5,6 +5,7 @@ struct Player
 {
 	int lives;
 	float x, y, speed, width, height;
+	bool isPlayer;
 };
 
 struct Ball
@@ -17,4 +18,6 @@ struct PowerUp
 {
 	float x, y,size, duration, effectDur;
 	char effect;
+	bool onScreen, inEffect;
+	int affecting;
 };

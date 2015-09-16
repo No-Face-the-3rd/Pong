@@ -7,7 +7,7 @@ void drawMenu(float screenH,float screenW, Player &selector,PowerUp pTypes[]);
 void drawChar(char test, float x, float y, float size);
 void drawPaddle(Player player);
 void drawBall(Ball &ball);
-void updatePlayer(Player &player, int playerNum, int screenH);
+void updatePlayer(Player &player, int playerNum, int screenH, int screenW, Ball ball);
 void updateSelector(Player &selector,float loc[],int &timer);
 void drawPowerup(PowerUp pUp);
 void initPowerUps(PowerUp pUp[],int size);
@@ -16,10 +16,10 @@ void initPowerUpTypes(PowerUp pUp[], int size);
 
 int main()
 {
-	int screenW = 1000, screenH = 700, lives = 3, dfRadius = 20;
+	int screenW = 1000, screenH = 700, lives = 3, dfRadius = 20,listSize = 0;
 	float dfWidth = 20.0f, dfHeight = 80.0f, dfPspeed = 0.50f, dfBspeed = 0.40f, speedToSpin = 650.0f, spinMulti = 200.0f, velDif = 0.0f;
-	Ball ball = {screenW / 2.0f, screenH/2.0f, 70.0f, 70.0f, 0.15f, 0.0f,0.0f, dfRadius};
-
+	Ball ball = {screenW / 2.0f, screenH/2.0f, -70.0f, -70.0f, 0.15f, 0.0f,0.0f, dfRadius};
+	srand(time(NULL));
 	Player selector{ 0,screenW / 2.0f + 4.0f*(screenH / 20.0f / 2.0f + 5.0f),screenH / 2.0f,0.0f,15.0f,20.0f };
 
 	PowerUp powerUps[5];
@@ -30,8 +30,8 @@ int main()
 	
 
 	sfw::initContext(screenW, screenH, "Wheel Pong");
-	Player player1{ lives,dfWidth/1.25f,(float)screenH / 2.0f,dfPspeed,dfWidth,dfHeight };
-	Player player2{ lives,(float)screenW - dfWidth/1.25f,(float)screenH / 2.0f ,dfPspeed,dfWidth,dfHeight };
+	Player player1{ lives,dfWidth/1.25f,(float)screenH / 2.0f,dfPspeed,dfWidth,dfHeight,false };
+	Player player2{ lives,(float)screenW - dfWidth/1.25f,(float)screenH / 2.0f ,dfPspeed,dfWidth,dfHeight,true };
 	
 
 	drawMenu((float)screenH,(float)screenW,selector,powerUps);
@@ -47,8 +47,8 @@ int main()
 		//ball.speed = sqrt(pow(ball.xVel, 2) + pow(ball.yVel, 2));
 
 
-		updatePlayer(player1, 1, screenH);
-		updatePlayer(player2, 2, screenH);
+		updatePlayer(player1, 1, screenH,screenW,ball);
+		updatePlayer(player2, 2, screenH,screenW,ball);
 
 		//drawChar(1, screenW / 2.0f, screenH / 2.0f, screenH / 20.0f);
 		//drawChar('B', screenW / 2.0f + screenW/30.0f, screenH / 2.0f, screenH / 20.0f);
@@ -105,6 +105,16 @@ void initPowerUpTypes(PowerUp pUp[], int size)
 	pUp[2].effect = 'L';
 	pUp[3].effect = 'S';
 	pUp[4].effect = 'F';
+	for (int i = 0; i < size; i++)
+	{
+		pUp[i].duration = 1000;
+		pUp[i].effectDur = 500;
+		pUp[i].x = -pUp[i].size;
+		pUp[i].y = -pUp[i].size;
+		pUp[i].onScreen = false;
+		pUp[i].inEffect = false;
+		pUp[i].affecting = 0;
+	}
 }
 
 void initPowerUps(PowerUp pUp[],int size)
@@ -116,6 +126,9 @@ void initPowerUps(PowerUp pUp[],int size)
 		pUp[i].size = 0;
 		pUp[i].duration = 1000;
 		pUp[i].effectDur = 500;
+		pUp[i].onScreen = false;
+		pUp[i].inEffect = false;
+		pUp[i].affecting = 0;
 	}
 
 
@@ -124,13 +137,25 @@ void initPowerUps(PowerUp pUp[],int size)
 
 void drawPowerup(PowerUp pUp)
 {
-	sfw::drawCircle(pUp.x, pUp.y, pUp.size);
-	drawChar(pUp.effect, pUp.x, pUp.y, pUp.size*3.0f / 4.0f);
-	if(pUp.duration > 0)
-		pUp.duration -= 0.16;
-	if (pUp.effectDur > 0)
-		pUp.effectDur -= 0.16;
-
+	if (pUp.onScreen)
+	{
+		sfw::drawCircle(pUp.x, pUp.y, pUp.size);
+		drawChar(pUp.effect, pUp.x, pUp.y, pUp.size*3.0f / 4.0f);
+		if (pUp.duration > 0)
+			pUp.duration -= 1;
+		else if (pUp.duration == 0)
+			pUp.onScreen = false;
+	}
+	else
+	{
+		if (pUp.effectDur > 0 && pUp.inEffect)
+			pUp.effectDur -= 1;
+		else if (pUp.effectDur == 0 && pUp.inEffect)
+		{
+			pUp.inEffect = false;
+			pUp.affecting = 0;
+		}
+	}
 }
 
 void updateSelector(Player &selector,float loc[3],int &timer)
@@ -157,16 +182,45 @@ void updateSelector(Player &selector,float loc[3],int &timer)
 	return;
 }
 
-void updatePlayer(Player &player, int playerNum, int screenH)
+void updatePlayer(Player &player, int playerNum, int screenH,int screenW,Ball ball)
 {
-	if (sfw::getKey('s') && playerNum == 1) player.y += player.speed;
-	if (sfw::getKey('w') && playerNum == 1) player.y -= player.speed;
-	if (sfw::getKey('k') && playerNum == 2) player.y += player.speed;
-	if (sfw::getKey('i') && playerNum == 2) player.y -= player.speed;
+	int trajectory = -1;
+	if (player.isPlayer)
+	{
+		if (sfw::getKey('s') && playerNum == 1) player.y += player.speed;
+		if (sfw::getKey('w') && playerNum == 1) player.y -= player.speed;
+		if (sfw::getKey('k') && playerNum == 2) player.y += player.speed;
+		if (sfw::getKey('i') && playerNum == 2) player.y -= player.speed;
+	}
+	else
+	{
+		while (((playerNum == 1 && ball.xVel < 0) || (playerNum == 2 && ball.xVel > 0)) )
+		{
+			if (playerNum == 1 && trajectory == -1)
+				trajectory = ball.y + abs((screenW - ball.x) / ball.xVel)*ball.yVel + (rand() % 100 - 50);
+			if (trajectory > screenH)
+				trajectory = screenH - (abs((screenW - ball.x) / ball.xVel) - abs((screenH - ball.y) / ball.yVel))*-ball.yVel + (rand() % 100 - 50);
+			if (trajectory < 0)
+				trajectory = (abs((screenW - ball.x) / ball.xVel) - abs((ball.y) / ball.yVel))*-ball.yVel - (rand() % 100 - 50);
+			if (!(trajectory <= screenH && trajectory >= 0))
+				trajectory = screenH / 2.0f;
+			if (trajectory <= screenH && trajectory >= 0)
+			{
+				break;
+			}
+		}
+		if (trajectory >= player.y )
+			player.y += player.speed;
+		if (trajectory < player.y )
+			player.y -= player.speed;
+		trajectory = -1;
+		
+	}
 	if (player.y > (float)screenH - player.height / 2.0f - 15.0f)
 		player.y = (float)screenH - player.height / 2.0f - 15.0f;
 	if (player.y < player.height / 2.0f + 15.0f)
 		player.y = player.height / 2.0f + 15.0f;
+
 
 }
 
@@ -592,39 +646,88 @@ void drawMenu(float screenH, float screenW,Player &selector,PowerUp pTypes[])
 			pTypes[i].size = screenH / 28.0f;
 			pTypes[i].x = pTypes[i].size + 10.0f;
 			pTypes[i].y = (i+1.0f)*screenH / 6.0f;
+			pTypes[i].onScreen = true;
+			pTypes[i].effectDur = -1;
 			drawPowerup(pTypes[i]);
 		}
+		
+		{
+			drawChar('I', pTypes[0].x + pTypes[0].size * 1.5f, pTypes[0].y, pTypes[0].size);
+			drawChar('n', pTypes[0].x + pTypes[0].size * 2.5f, pTypes[0].y, pTypes[0].size);
+			drawChar('v', pTypes[0].x + pTypes[0].size * 3.5f, pTypes[0].y, pTypes[0].size);
+			drawChar('e', pTypes[0].x + pTypes[0].size * 4.5f, pTypes[0].y, pTypes[0].size);
+			drawChar('r', pTypes[0].x + pTypes[0].size * 5.5f, pTypes[0].y, pTypes[0].size);
+			drawChar('t', pTypes[0].x + pTypes[0].size * 6.5f, pTypes[0].y, pTypes[0].size);
+		}
 
+		{
+			drawChar('B', pTypes[1].x + pTypes[1].size * 1.5f, pTypes[1].y, pTypes[1].size);
+			drawChar('i', pTypes[1].x + pTypes[1].size * 2.5f, pTypes[1].y, pTypes[1].size);
+			drawChar('g', pTypes[1].x + pTypes[1].size * 3.5f, pTypes[1].y, pTypes[1].size);
+		}
 
+		{
+			drawChar('L', pTypes[2].x + pTypes[2].size * 1.5f, pTypes[2].y, pTypes[2].size);
+			drawChar('i', pTypes[2].x + pTypes[2].size * 2.5f, pTypes[2].y, pTypes[2].size);
+			drawChar('t', pTypes[2].x + pTypes[2].size * 3.5f, pTypes[2].y, pTypes[2].size);
+			drawChar('t', pTypes[2].x + pTypes[2].size * 4.5f, pTypes[2].y, pTypes[2].size);
+			drawChar('l', pTypes[2].x + pTypes[2].size * 5.5f, pTypes[2].y, pTypes[2].size);
+			drawChar('e', pTypes[2].x + pTypes[2].size * 6.5f, pTypes[2].y, pTypes[2].size);
+		}
 
+		{
+			drawChar('S', pTypes[3].x + pTypes[3].size * 1.5f, pTypes[3].y, pTypes[0].size);
+			drawChar('l', pTypes[3].x + pTypes[3].size * 2.5f, pTypes[3].y, pTypes[0].size);
+			drawChar('o', pTypes[3].x + pTypes[3].size * 3.5f, pTypes[3].y, pTypes[0].size);
+			drawChar('w', pTypes[3].x + pTypes[3].size * 4.5f, pTypes[3].y, pTypes[0].size);
+		}
+
+		{
+			drawChar('F', pTypes[4].x + pTypes[4].size * 1.5f, pTypes[4].y, pTypes[4].size);
+			drawChar('a', pTypes[4].x + pTypes[4].size * 2.5f, pTypes[4].y, pTypes[4].size);
+			drawChar('s', pTypes[4].x + pTypes[4].size * 3.5f, pTypes[4].y, pTypes[4].size);
+			drawChar('t', pTypes[4].x + pTypes[4].size * 4.5f, pTypes[4].y, pTypes[4].size);
+		}
 
 		updateSelector(selector, loc,timer);
+		{
+			drawChar('W', screenW / 2.0f - 4.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
+			drawChar('h', screenW / 2.0f - 3.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
+			drawChar('e', screenW / 2.0f - 2.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
+			drawChar('e', screenW / 2.0f - 1.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
+			drawChar('l', screenW / 2.0f - 0.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
+			drawChar('g', screenW / 2.0f + 4.0f * (size / 2.0f + gap) + size / 4.0f, size + 5, size);
+			drawChar('n', screenW / 2.0f + 3.0f * (size / 2.0f + gap) + size / 4.0f, size + 5, size);
+			drawChar('o', screenW / 2.0f + 2.0f * (size / 2.0f + gap) + size / 4.0f, size + 5, size);
+			drawChar('P', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 4.0f, size + 5, size);
+		}
 
-		drawChar('W', screenW / 2.0f - 4.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
-		drawChar('h', screenW / 2.0f - 3.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
-		drawChar('e', screenW / 2.0f - 2.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
-		drawChar('e', screenW / 2.0f - 1.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
-		drawChar('l', screenW / 2.0f - 0.0f * (size / 2.0f + gap) - size / 4.0f, size + 5, size);
-		drawChar('g', screenW / 2.0f + 4.0f * (size / 2.0f + gap) + size / 4.0f, size + 5, size);
-		drawChar('n', screenW / 2.0f + 3.0f * (size / 2.0f + gap) + size / 4.0f, size + 5, size);
-		drawChar('o', screenW / 2.0f + 2.0f * (size / 2.0f + gap) + size / 4.0f, size + 5, size);
-		drawChar('P', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 4.0f, size + 5, size);
+		{
+			drawChar(1, screenW / 2.0f + 0.0f * (size / 2.0f + gap) + size / 2.0f, screenH / 2.0f, size);
+			drawChar('P', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 2.0f, screenH / 2.0f, size);
+		}
 
-		drawChar(1, screenW / 2.0f + 0.0f * (size / 2.0f + gap) + size / 2.0f,screenH / 2.0f, size);
-		drawChar('P', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 2.0f,screenH / 2.0f, size);
+		{
+			drawChar(2, screenW / 2.0f + 0.0f * (size / 2.0f + gap) + size / 2.0f, screenH*2.0f / 3.0f, size);
+			drawChar('P', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 2.0f, screenH*2.0f / 3.0f, size);
+		}
 
-		drawChar(2, screenW / 2.0f + 0.0f * (size / 2.0f + gap) + size / 2.0f, screenH*2.0f / 3.0f, size);
-		drawChar('P', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 2.0f, screenH*2.0f / 3.0f, size);
+		{
+			drawChar('E', screenW / 2.0f - 1.0f * (size / 2.0f + gap) - size / 4.0f, screenH - (size + 5), size);
+			drawChar('X', screenW / 2.0f - gap / 2.0f - size / 4.0f, screenH - (size + 5), size);
+			drawChar('I', screenW / 2.0f + gap / 2.0f + size / 4.0f, screenH - (size + 5), size);
+			drawChar('T', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 4.0f, screenH - (size + 5), size);
+		}
 
-		drawChar('E', screenW / 2.0f - 1.0f * (size / 2.0f + gap) - size / 4.0f, screenH - (size + 5), size);
-		drawChar('X', screenW / 2.0f - gap / 2.0f - size / 4.0f, screenH - (size + 5), size);
-		drawChar('I', screenW / 2.0f + gap / 2.0f + size / 4.0f, screenH - (size + 5), size);
-		drawChar('T', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 4.0f, screenH - (size + 5), size);
 		if (sfw::getKey(' '))
 		{
 			if (selector.lives == 2)
 			{
 				sfw::termContext();
+				break;
+			}
+			if (selector.lives == 1)
+			{
 				break;
 			}
 		}

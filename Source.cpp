@@ -10,28 +10,31 @@ void drawBall(Ball &ball);
 void updatePlayer(Player &player, int playerNum, int screenH, int screenW, Ball ball);
 void updateSelector(Player &selector,float loc[],int &timer);
 void drawPowerup(PowerUp pUp);
-void initPowerUps(PowerUp pUp[],int size);
+void resetPowerUps(PowerUp pUp[],int size);
 void initPowerUpTypes(PowerUp pUp[], int size);
+void launchBall(Ball &ball, Player &player1, Player &player2, PowerUp pUp[]);
 
 
 int main()
 {
 	int screenW = 1000, screenH = 700, lives = 3, dfRadius = 20,listSize = 0;
-	float dfWidth = 20.0f, dfHeight = 80.0f, dfPspeed = 0.50f, dfBspeed = 0.40f, speedToSpin = 650.0f, spinMulti = 200.0f, velDif = 0.0f;
-	Ball ball = {screenW / 2.0f, screenH/2.0f, -70.0f, -70.0f, 0.15f, 0.0f,0.0f, dfRadius};
+	float dfWidth = 20.0f, dfHeight = 80.0f, dfPspeed = (float)screenH/120.0f, spinMulti = 150.0f,speedMin = 100.0f,speedMax = 200.0f;
+	
+	
+	Ball ball = {(float)screenW/2.0f, (float)screenH/2.0f, 0.0f, 0.0f, 0.30f, 0.0f,0.0f, dfRadius,(float)screenW/2.0f,(float)screenH/2.0f};
 	srand(time(NULL));
-	Player selector{ 0,screenW / 2.0f + 4.0f*(screenH / 20.0f / 2.0f + 5.0f),screenH / 2.0f,0.0f,15.0f,20.0f };
+	Player selector{ 0,screenW / 2.0f + 4.0f*(screenH / 40.0f + 5.0f),screenH / 2.0f,0.0f,15.0f,20.0f,false,0,0 };
 
 	PowerUp powerUps[5];
 	initPowerUpTypes(powerUps,5);
 	
 	PowerUp pList[6];
-	initPowerUps(pList,6);
+	resetPowerUps(pList,6);
 	
 
 	sfw::initContext(screenW, screenH, "Wheel Pong");
-	Player player1{ lives,dfWidth/1.25f,(float)screenH / 2.0f,dfPspeed,dfWidth,dfHeight,false };
-	Player player2{ lives,(float)screenW - dfWidth/1.25f,(float)screenH / 2.0f ,dfPspeed,dfWidth,dfHeight,true };
+	Player player1{ lives,dfWidth/1.25f,(float)screenH / 2.0f,dfPspeed,dfWidth,dfHeight,false,0,0 };
+	Player player2{ lives,(float)screenW - dfWidth/1.25f,(float)screenH / 2.0f ,dfPspeed,dfWidth,dfHeight,false,0,0 };
 	
 
 	drawMenu((float)screenH,(float)screenW,selector,powerUps);
@@ -42,60 +45,175 @@ int main()
 		drawPaddle(player2);
 		drawBall(ball);
 
-		ball.y += ball.yVel* sfw::getDeltaTime();
-		ball.x += ball.xVel* sfw::getDeltaTime();
-		//ball.speed = sqrt(pow(ball.xVel, 2) + pow(ball.yVel, 2));
 
+		if (player1.lives > 0 && player2.lives > 0)
+		{
+			ball.y += ball.yVel * sfw::getDeltaTime();
+			ball.x += ball.xVel * sfw::getDeltaTime();
+			ball.speed = sqrt(pow(ball.xVel, 2) + pow(ball.yVel, 2));
 
-		updatePlayer(player1, 1, screenH,screenW,ball);
-		updatePlayer(player2, 2, screenH,screenW,ball);
+			updatePlayer(player1, 1, screenH, screenW, ball);
+			updatePlayer(player2, 2, screenH, screenW, ball);
 
-		//drawChar(1, screenW / 2.0f, screenH / 2.0f, screenH / 20.0f);
-		//drawChar('B', screenW / 2.0f + screenW/30.0f, screenH / 2.0f, screenH / 20.0f);
-		if (ball.y > (float)screenH - ball.radius - 5.0f) 
-		{
-			ball.y = (float)screenH - ball.radius - 5.0f;
-			velDif = ball.yVel - sqrt(abs(pow(ball.speed, 2.0f) - pow(ball.xVel - spinMulti*ball.spin, 2.0f)));
-			if (velDif < 0)
-				ball.yVel = -ball.yVel - velDif;
-			if (velDif > 0)
-				ball.yVel = -ball.yVel + velDif;
-			ball.xVel =ball.xVel - spinMulti * ball.spin;
-		}
-		if (ball.y < ball.radius + 5.0f)
-		{
-			ball.y = ball.radius + 5.0f;
-			velDif = ball.yVel + sqrt(abs(pow(ball.speed, 2.0f) - pow(ball.xVel + spinMulti*ball.spin, 2.0f)));
-			if (velDif < 0)
-				ball.yVel = -ball.yVel + velDif;
-			if (velDif > 0)
-				ball.yVel = -ball.yVel - velDif;
-			ball.xVel = ball.xVel + spinMulti * ball.spin;
-			//ball.xVel = ball.xVel - spinMulti * ball.spin;
-			//ball.yVel = -ball.yVel - 200 * ball.spin;
-			//ball.xVel += 200 * ball.spin;
-		}
-		if (ball.x >(float)screenW - ball.radius - 5.0f)
-		{
-			ball.x = (float)screenW - ball.radius - 5.0f;
-			ball.xVel = -ball.xVel + 200 * ball.spin;
-			ball.yVel += 200 * ball.spin;
-		}
-		if (ball.x < ball.radius + 5.0f)
-		{
-			ball.x = ball.radius + 5.0f;
-			ball.xVel = -ball.xVel - 200 * ball.spin;
-			ball.yVel -= 200 * ball.spin;
-		}
+			if (ball.speed < speedMin)
+			{
+				if (ball.xVel < 0)
+					ball.xVel -= 25;
+				else
+					ball.xVel += 25;
+				if (ball.yVel < 0)
+					ball.yVel -= 15;
+				else
+					ball.yVel += 15;
+			}
+			if (ball.speed > speedMax)
+			{
+				if (ball.xVel < 0)
+					ball.xVel += 20;
+				else
+					ball.xVel -= 20;
+				if (ball.yVel < 0)
+					ball.yVel += 20;
+				else
+					ball.yVel -= 20;
+			}
 
+			if (ball.y > (float)screenH - ball.radius - 5.0f)
+			{
+				ball.y = (float)screenH - ball.radius - 10.0f;
+				ball.xVel = ball.xVel + -spinMulti*ball.spin;
+				ball.yVel = -ball.yVel + abs(spinMulti / 2.0f*ball.spin);
+				//ball.yVel *= -1;
+			}
+			if (ball.y < ball.radius + 5.0f)
+			{
+				ball.y = ball.radius + 10.0f;
+				ball.xVel = ball.xVel + spinMulti*ball.spin;
+				ball.yVel = -ball.yVel - abs(spinMulti / 2.0f*ball.spin);
+
+				//ball.yVel *= -1;
+
+			}
+			if (ball.x > (float)screenW - ball.radius - 5.0f)
+			{
+				ball.x = (float)screenW - ball.radius - 5.0f;
+				ball.xVel *= -1;
+
+			}
+			if (ball.x < ball.radius + 5.0f)
+			{
+				ball.x = ball.radius + 5.0f;
+				ball.xVel *= -1;
+
+			}
+			if (ball.x <= player1.x + player1.width / 2.0f + ball.radius)
+			{
+				if (ball.y >= player1.y + player1.height / 4.0f && ball.y <= player1.y + player1.height / 2.0f)
+				{
+					if (ball.spin > 0)
+						ball.spin *= -1;
+				}
+				if (ball.y >= player1.y - player1.height / 2.0f && ball.y <= player1.y - player1.height / 4.0f)
+				{
+					if (ball.spin < 0)
+						ball.spin *= -1;
+				}
+				if (ball.y >= player1.y - player1.height / 2.0f && ball.y <= player1.y + player1.height / 2.0f)
+				{
+					ball.x = player1.x + player1.width / 2.0f + ball.radius;
+					ball.yVel = ball.yVel + -spinMulti*ball.spin;
+					ball.xVel = -ball.xVel + abs(spinMulti / 2.0f*ball.spin);
+				}
+				if (sqrt(pow(ball.x - (player1.x), 2) + pow(ball.y - (player1.y + player1.height / 2.0f), 2)) <= player1.width / 2.0f + ball.radius)
+				{
+					ball.xVel = 10;
+					ball.yVel = 80;
+					if (ball.spin > 0)
+						ball.spin *= -1;
+				}
+				if (sqrt(pow(ball.x - (player1.x), 2) + pow(ball.y - (player1.y - player1.height / 2.0f), 2)) <= player1.width / 2.0f + ball.radius)
+				{
+					ball.xVel = 10;
+					ball.yVel = -80;
+					if (ball.spin < 0)
+						ball.spin *= -1;
+				}
+			}
+			if (ball.x >= player2.x - player2.width / 2.0f - ball.radius)
+			{
+				if (ball.y >= player2.y + player2.height / 4.0f && ball.y <= player2.y + player2.height / 2.0f)
+				{
+					if (ball.spin < 0)
+						ball.spin *= -1;
+				}
+				if (ball.y >= player2.y - player2.height / 2.0f && ball.y <= player2.y - player2.height / 4.0f)
+				{
+					if (ball.spin > 0)
+						ball.spin *= -1;
+				}
+				if (ball.y >= player2.y - player2.height / 2.0f && ball.y <= player2.y + player2.height / 2.0f)
+				{
+					ball.x = player2.x - player2.width / 2.0f - ball.radius;
+					ball.yVel = ball.yVel + spinMulti*ball.spin;
+					ball.xVel = -ball.xVel - abs(spinMulti / 2.0f*ball.spin);
+				}
+				if (sqrt(pow(ball.x - (player2.x), 2) + pow(ball.y - (player2.y + player2.height / 2.0f), 2)) <= player2.width / 2.0f + ball.radius)
+				{
+					ball.xVel = -10;
+					ball.yVel = 80;
+					if (ball.spin < 0)
+						ball.spin *= -1;
+				}
+				if (sqrt(pow(ball.x - (player2.x), 2) + pow(ball.y - (player2.y - player2.height / 2.0f), 2)) <= player2.width / 2.0f + ball.radius)
+				{
+					ball.xVel = -10;
+					ball.yVel = -80;
+					if (ball.spin > 0)
+						ball.spin *= -1;
+				}
+			}
+
+		}
 
 		if (player1.lives <= 0 || player2.lives <= 0)
-			drawMenu(screenH,screenW,selector,powerUps);
+		{
+			if (sfw::getKey(' '))
+				drawMenu(screenH, screenW, selector, powerUps);
+		}
 		if (selector.lives == 2)
 			break;
+		if (selector.lives == 0)
+		{
+			player1.isPlayer = true;
+			player2.isPlayer = false;
+		}
+		if (selector.lives == 1 )
+		{
+			player1.isPlayer = true;
+			player2.isPlayer = true;
+		}
+		//if (sfw::getKey(' '))
+			//launchBall(ball, player1, player2, pList);
+
 	}
 
 	return 0;
+}
+
+void launchBall(Ball &ball, Player &player1, Player &player2, PowerUp pUp[])
+{
+	ball.x = ball.defX;
+	ball.y = ball.defY;
+	ball.xVel = rand() % 140 - 70;
+	ball.yVel = rand() % 140 - 70;
+	if (abs(ball.xVel) < 20)
+		if (ball.xVel < 0)
+			ball.xVel -= 30;
+		else
+			ball.xVel += 30;
+	player1.y = ball.defY;
+	player2.y = ball.defY;
+
 }
 
 void initPowerUpTypes(PowerUp pUp[], int size)
@@ -117,7 +235,7 @@ void initPowerUpTypes(PowerUp pUp[], int size)
 	}
 }
 
-void initPowerUps(PowerUp pUp[],int size)
+void resetPowerUps(PowerUp pUp[],int size)
 {
 	for (int i = 0; i < size; i++)
 	{
@@ -194,25 +312,48 @@ void updatePlayer(Player &player, int playerNum, int screenH,int screenW,Ball ba
 	}
 	else
 	{
-		while (((playerNum == 1 && ball.xVel < 0) || (playerNum == 2 && ball.xVel > 0)) )
+		if ((playerNum == 1 && ball.xVel < 0 || playerNum == 2 && ball.xVel > 0))
 		{
-			if (playerNum == 1 && trajectory == -1)
-				trajectory = ball.y + abs((screenW - ball.x) / ball.xVel)*ball.yVel + (rand() % 100 - 50);
-			if (trajectory > screenH)
-				trajectory = screenH - (abs((screenW - ball.x) / ball.xVel) - abs((screenH - ball.y) / ball.yVel))*-ball.yVel + (rand() % 100 - 50);
-			else if (trajectory < 0)
-				trajectory = (abs((screenW - ball.x) / ball.xVel) - abs((ball.y) / ball.yVel))*ball.yVel - (rand() % 100 - 50);
-			if (!(trajectory <= screenH && trajectory >= 0))
-				trajectory = screenH / 2.0f;
-			if (trajectory <= screenH && trajectory >= 0)
+			if (playerNum == 1)
 			{
-				break;
+				trajectory = ball.y + abs(( ball.x) / ball.xVel)*ball.yVel + 2*player.height * player.acc;
+				if (trajectory > screenH)
+					trajectory = screenH + (abs(( ball.x) / ball.xVel) - abs((screenH - ball.y) / ball.yVel))*-ball.yVel + 2 * player.height * player.acc;
+				else if (trajectory < 0)
+					trajectory = (abs(( ball.x) / ball.xVel) - abs((ball.y) / ball.yVel))*-ball.yVel + 2 * player.height * player.acc;
+			}
+			if (playerNum == 2)
+			{
+				trajectory = ball.y + abs((screenW -ball.x) / ball.xVel)*ball.yVel + 2 * player.height * player.acc;
+				if (trajectory > screenH)
+					trajectory = screenH + (abs((screenW -ball.x) / ball.xVel) - abs((screenH - ball.y) / ball.yVel))*-ball.yVel + 2 * player.height * player.acc;
+				else if (trajectory < 0)
+					trajectory = (abs((screenW -ball.x) / ball.xVel) - abs((ball.y) / ball.yVel))*-ball.yVel + 2 * player.height * player.acc;
 			}
 		}
-		if (trajectory > player.y )
+
+
+
+		player.aiTime-=3;
+		if ((playerNum == 1 && ball.xVel > 0) || (playerNum == 2 && ball.xVel < 0))
+		{
+			trajectory = screenH / 2.0f;
+			player.acc = 0;
+		}
+		if (trajectory > player.y && player.aiTime <= 0)
+		{
 			player.y += player.speed;
-		if (trajectory < player.y )
+			player.aiTime += 5;
+			if (player.aiTime == 5)
+				player.acc = rand() % 3 - 1;
+		}
+		if (trajectory < player.y && player.aiTime <= 0)
+		{
 			player.y -= player.speed;
+			player.aiTime += 5;
+			if (player.aiTime == 5)
+				player.acc = rand() % 3 - 1;
+		}
 		trajectory = -1;
 		
 	}
@@ -231,8 +372,8 @@ void drawBall(Ball &ball)
 	sfw::drawLine(ball.x + sin((ball.angle + 45) * PI / 180) * ball.radius, ball.y + cos((ball.angle + 45) * PI / 180) * ball.radius, ball.x + sin((ball.angle + 225) * PI / 180) * ball.radius, ball.y + cos((ball.angle + 225) * PI / 180) * ball.radius);
 	sfw::drawLine(ball.x + sin((ball.angle + 90) * PI / 180) * ball.radius, ball.y + cos((ball.angle + 90) * PI / 180) * ball.radius, ball.x + sin((ball.angle + 270) * PI / 180) * ball.radius, ball.y + cos((ball.angle + 270) * PI / 180) * ball.radius);
 	sfw::drawLine(ball.x + sin((ball.angle + 135) * PI / 180) * ball.radius, ball.y + cos((ball.angle + 135) * PI / 180) * ball.radius, ball.x + sin((ball.angle + 315) * PI / 180) * ball.radius, ball.y + cos((ball.angle + 315) * PI / 180) * ball.radius);
-	if (ball.spin > 0) ball.angle += ball.spin;
-	else ball.angle -= ball.spin;
+	ball.angle += 10*ball.spin;
+
 	return;
 }
 
@@ -245,6 +386,8 @@ void drawPaddle(Player player)
 		sfw::drawLine(player.x + cos(i*PI / 180) * (player.width / 2.0f), player.y + sin(i*PI/180)*(player.width/2.0f) + player.height/2.0f, player.x + cos((i+10)*PI/180)*(player.width / 2.0f), player.y + sin((i+10)*PI/180)*(player.width/2.0f) + player.height/2.0f);
 		sfw::drawLine(player.x + cos(i*PI / 180) * (player.width / 2.0f), player.y - sin(i*PI/180)*(player.width/2.0f) - player.height/2.0f, player.x + cos((i+10)*PI/180)*(player.width / 2.0f), player.y - sin((i+10)*PI/180)*(player.width/2.0f) - player.height/2.0f);
 	}
+	if(player.speed >0)
+		drawChar(player.lives, player.x, player.y, player.width*7.0f/8.0f);
 }
 
 void drawChar(char test, float x, float y, float size)
@@ -726,7 +869,7 @@ void drawMenu(float screenH, float screenW,Player &selector,PowerUp pTypes[])
 				sfw::termContext();
 				break;
 			}
-			if (selector.lives == 1)
+			if (selector.lives == 1 || selector.lives == 0)
 			{
 				break;
 			}

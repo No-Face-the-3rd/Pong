@@ -1,28 +1,21 @@
-﻿Build started 9/16/2015 12:39:47 PM.
-     1>Project "C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Pong\Pong.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Source.cpp
-         Source.cpp
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(22): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(93): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(200): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(202): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(204): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(206): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(229): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(230): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(231): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(232): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(233): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(245): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(246): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\jacob.dodson\documents\visual studio 2015\projects\pong\pong\source.cpp(252): warning C4305: 'initializing': truncation from 'double' to 'float'
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Debug\Pong.exe" /INCREMENTAL /NOLOGO SFW.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Debug\Pong.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Debug\Pong.lib" /MACHINE:X86 Debug\Source.obj
-         SFW.lib
-         Pong.vcxproj -> C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Debug\Pong.exe
-     1>Done Building Project "C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Pong\Pong.vcxproj" (Build target(s)).
-
-Build succeeded.
-
-Time Elapsed 00:00:00.72
+﻿  Source.cpp
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(25): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(177): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(202): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(203): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(314): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(316): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(318): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(322): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(324): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(326): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(335): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(365): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(366): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(367): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(368): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(369): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(381): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(382): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\jacob\documents\visual studio 2015\projects\pong\source.cpp(390): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Pong.vcxproj -> C:\Users\Jacob\documents\visual studio 2015\Projects\Pong\Debug\Pong.exe

@@ -11,20 +11,23 @@ void updatePlayer(Player &player, int playerNum, int screenH, int screenW, Ball 
 void updateSelector(Player &selector,float loc[],int &timer);
 void drawPowerup(PowerUp pUp);
 void resetPowerUps(PowerUp pUp[],int size);
+void resetPowerUps(PowerUp pUp);
 void initPowerUpTypes(PowerUp pUp[], int size);
+void updatePUp(PowerUp pUp);
 void launchBall(Ball &ball, Player &player1, Player &player2, PowerUp pUp[]);
+void startGame(Player p1, Player p2);
 
 
 int main()
 {
-	int screenW = 1000, screenH = 700, lives = 3, dfRadius = 20,listSize = 0;
+	int screenW = 1000, screenH = 700, lives = 3, dfRadius = 20, listSize = 0, p1Del = 0, p2Del = 0, pUpDel = 0;
 	float dfWidth = 20.0f, dfHeight = 80.0f, dfPspeed = (float)screenH/120.0f, spinMulti = 150.0f,speedMin = 100.0f,speedMax = 200.0f;
 	
 	
 	Ball ball = {(float)screenW/2.0f, (float)screenH/2.0f, 0.0f, 0.0f, 0.30f, 0.0f,0.0f, dfRadius,(float)screenW/2.0f,(float)screenH/2.0f};
 	srand(time(NULL));
 	Player selector{ 0,screenW / 2.0f + 4.0f*(screenH / 40.0f + 5.0f),screenH / 2.0f,0.0f,15.0f,20.0f,false,0,0 };
-
+	
 	PowerUp powerUps[5];
 	initPowerUpTypes(powerUps,5);
 	
@@ -33,8 +36,8 @@ int main()
 	
 
 	sfw::initContext(screenW, screenH, "Wheel Pong");
-	Player player1{ lives,dfWidth/1.25f,(float)screenH / 2.0f,dfPspeed,dfWidth,dfHeight,false,0,0 };
-	Player player2{ lives,(float)screenW - dfWidth/1.25f,(float)screenH / 2.0f ,dfPspeed,dfWidth,dfHeight,false,0,0 };
+	Player player1{ lives,dfWidth/1.25f,(float)screenH / 2.0f,dfPspeed,dfWidth,dfHeight,true,0,0 };
+	Player player2{ lives,(float)screenW - dfWidth/1.25f,(float)screenH / 2.0f ,dfPspeed,dfWidth,dfHeight,true,0,0 };
 	
 
 	drawMenu((float)screenH,(float)screenW,selector,powerUps);
@@ -45,6 +48,11 @@ int main()
 		drawPaddle(player2);
 		drawBall(ball);
 
+		for (int i = 0; i < 6; i++)
+		{
+			drawPowerup(pList[i]);
+		}
+
 
 		if (player1.lives > 0 && player2.lives > 0)
 		{
@@ -54,6 +62,25 @@ int main()
 
 			updatePlayer(player1, 1, screenH, screenW, ball);
 			updatePlayer(player2, 2, screenH, screenW, ball);
+			
+			p1Del--;
+			p2Del--;
+			if (sfw::getKey('a')&&p1Del <= 0) 
+			{
+				player1.isPlayer = !player1.isPlayer;
+				p1Del = 20;
+			}
+			if (sfw::getKey('l') && p2Del <= 0)
+			{
+				player2.isPlayer = !player2.isPlayer;
+				p2Del = 20;
+			}
+
+			for (int i = 0; i < 6; i++)
+			{
+				drawPowerup(pList[i]);
+				updatePUp(pList[i]);
+			}
 
 			if (ball.speed < speedMin)
 			{
@@ -94,16 +121,16 @@ int main()
 				//ball.yVel *= -1;
 
 			}
-			if (ball.x > (float)screenW - ball.radius - 5.0f)
+			if (ball.x > (float)screenW - ball.radius)
 			{
-				ball.x = (float)screenW - ball.radius - 5.0f;
-				ball.xVel *= -1;
+				player2.lives--;
+				launchBall(ball, player1, player2, pList);
 
 			}
-			if (ball.x < ball.radius + 5.0f)
+			if (ball.x < ball.radius)
 			{
-				ball.x = ball.radius + 5.0f;
-				ball.xVel *= -1;
+				player1.lives--;
+				launchBall(ball, player1, player2, pList);
 
 			}
 			if (ball.x <= player1.x + player1.width / 2.0f + ball.radius)
@@ -182,22 +209,34 @@ int main()
 		}
 		if (selector.lives == 2)
 			break;
-		if (selector.lives == 0)
+		if (selector.acc == 1)
 		{
-			player1.isPlayer = true;
-			player2.isPlayer = false;
+			if (selector.lives == 0)
+			{
+				startGame(player1, player2);
+				player2.isPlayer = false;
+				launchBall(ball, player1, player2, pList[]);
+				selector.acc = 0;
+			}
+			if (selector.lives == 1)
+			{
+				startGame(player1, player2);
+				player2.isPlayer = true;
+				launchBall(ball, player1, player2, pList[]);
+				selector.acc = 0;
+			}
 		}
-		if (selector.lives == 1 )
-		{
-			player1.isPlayer = true;
-			player2.isPlayer = true;
-		}
-		//if (sfw::getKey(' '))
-			//launchBall(ball, player1, player2, pList);
 
 	}
 
 	return 0;
+}
+
+void startGame(Player p1, Player p2)
+{
+	p1.lives = 3;
+	p2.lives = 3;
+	p1.isPlayer = true;
 }
 
 void launchBall(Ball &ball, Player &player1, Player &player2, PowerUp pUp[])
@@ -213,7 +252,30 @@ void launchBall(Ball &ball, Player &player1, Player &player2, PowerUp pUp[])
 			ball.xVel += 30;
 	player1.y = ball.defY;
 	player2.y = ball.defY;
+	for (int i = 0; i < 6; i++)
+	{
+		resetPowerUps(pUp[i]);
+		updatePUp(pUp[i]);
+	}
 
+}
+
+void updatePUp(PowerUp pUp)
+{
+	pUp.duration--;
+	if (pUp.duration <= 0)
+	{
+		pUp.onScreen = false;
+	}
+	if (pUp.inEffect)
+	{
+		pUp.effectDur--;
+		if (pUp.effectDur <= 0)
+		{
+			pUp.inEffect = false;
+
+		}
+	}
 }
 
 void initPowerUpTypes(PowerUp pUp[], int size)
@@ -233,6 +295,13 @@ void initPowerUpTypes(PowerUp pUp[], int size)
 		pUp[i].inEffect = false;
 		pUp[i].affecting = 0;
 	}
+}
+
+void resetPowerUps(PowerUp pUp)
+{
+	pUp.duration = 0;
+	pUp.effectDur = 0;
+	pUp.onScreen = false;
 }
 
 void resetPowerUps(PowerUp pUp[],int size)
@@ -259,20 +328,6 @@ void drawPowerup(PowerUp pUp)
 	{
 		sfw::drawCircle(pUp.x, pUp.y, pUp.size);
 		drawChar(pUp.effect, pUp.x, pUp.y, pUp.size*3.0f / 4.0f);
-		if (pUp.duration > 0)
-			pUp.duration -= 1;
-		else if (pUp.duration == 0)
-			pUp.onScreen = false;
-	}
-	else
-	{
-		if (pUp.effectDur > 0 && pUp.inEffect)
-			pUp.effectDur -= 1;
-		else if (pUp.effectDur == 0 && pUp.inEffect)
-		{
-			pUp.inEffect = false;
-			pUp.affecting = 0;
-		}
 	}
 }
 
@@ -871,6 +926,7 @@ void drawMenu(float screenH, float screenW,Player &selector,PowerUp pTypes[])
 			}
 			if (selector.lives == 1 || selector.lives == 0)
 			{
+				selector.acc = 1;
 				break;
 			}
 		}

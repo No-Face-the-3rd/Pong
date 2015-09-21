@@ -1,0 +1,14 @@
+Scope-
+The goal of this project was to create a pong game that used the spinning of the ball to change the trajectory on bounce. 
+Paddles could change the spin if hit in certain locations.There was intended to be assorted powerups that affected paddles and balls.
+I was unable to get the powerups functioning prior to the due date.
+Technologies-
+I used the SFW.lib provided because I wanted to see what I would be able to make using it.
+I referenced StackOverflow several times for various reasons, but usually to see the syntax and to remind myself exactly how functions worked.
+Failures-
+I was unable to get the powerups done in time. I had intended to make the ball retain a certain overall velocity, but that fell through and I ended up just modifying the
+overall velocity if it fell outside of a range. Also, I was unable to get the ai to function exactly how I desired.
+Challenges -
+
+Conclusion -
+I would set a trajectory variable to the paddle to allow an easier implementation of the ai.

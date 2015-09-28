@@ -21,7 +21,7 @@ void startGame(Player &p1, Player &p2);
 int main()
 {
 	int screenW = 1000, screenH = 700, lives = 3, dfRadius = 20, listSize = 0, p1Del = 0, p2Del = 0, pUpDel = 0;
-	float dfWidth = 20.0f, dfHeight = 80.0f, dfPspeed = (float)screenH/770.0f, spinMulti = 5500.0f,speedMin = 200.0f,speedMax = 500.0f;
+	float dfWidth = 20.0f, dfHeight = 80.0f, dfPspeed = (float)screenH/770.0f, spinMulti = 5500.0f,speedMin = 250.0f,speedMax = 750.0f;
 	
 	
 	Ball ball = {(float)screenW/2.0f, (float)screenH/2.0f, 0.0f, 0.0f, 0.02f, 0.0f,0.0f, dfRadius,(float)screenW/2.0f,(float)screenH/2.0f};
@@ -226,7 +226,7 @@ int main()
 			if (player1.lives < player2.lives)
 			{
 				drawChar('P', screenW / 4.0f, screenH / 3.0f, screenH / 10.0f);
-				drawChar(2, screenW / 4.0f + screenH/7.5f, screenH / 3.0f, screenH / 10.0f);
+				drawChar('2', screenW / 4.0f + screenH/7.5f, screenH / 3.0f, screenH / 10.0f);
 				drawChar('W', screenW*3.0f / 4.0f - 1 * screenH / 7.5f, screenH / 3.0f, screenH / 10.0f);
 				drawChar('i', screenW*3.0f / 4.0f + 0 * screenH / 7.5f, screenH / 3.0f, screenH / 10.0f);
 				drawChar('n', screenW*3.0f / 4.0f + 1 * screenH / 7.5f, screenH / 3.0f, screenH / 10.0f);
@@ -235,7 +235,7 @@ int main()
 			else if (player2.lives < player1.lives)
 			{
 				drawChar('P', screenW / 4.0f, screenH / 3.0f, screenH / 10.0f);
-				drawChar(1, screenW / 4.0f + screenH / 7.5f, screenH / 3.0f, screenH / 10.0f);
+				drawChar('1', screenW / 4.0f + screenH / 7.5f, screenH / 3.0f, screenH / 10.0f);
 				drawChar('W', screenW*3.0f / 4.0f - 1 * screenH / 7.5f, screenH / 3.0f, screenH / 10.0f);
 				drawChar('i', screenW*3.0f / 4.0f + 0 * screenH / 7.5f, screenH / 3.0f, screenH / 10.0f);
 				drawChar('n', screenW*3.0f / 4.0f + 1 * screenH / 7.5f, screenH / 3.0f, screenH / 10.0f);
@@ -466,7 +466,7 @@ void drawPaddle(Player player)
 		sfw::drawLine(player.x + cos(i*PI / 180) * (player.width / 2.0f), player.y - sin(i*PI/180)*(player.width/2.0f) - player.height/2.0f, player.x + cos((i+10)*PI/180)*(player.width / 2.0f), player.y - sin((i+10)*PI/180)*(player.width/2.0f) - player.height/2.0f);
 	}
 	if(player.speed >0)
-		drawChar(player.lives, player.x, player.y, player.width*7.0f/8.0f);
+		drawChar(player.lives+48, player.x, player.y, player.width*7.0f/8.0f);
 }
 
 void drawChar(char test, float x, float y, float size)
@@ -793,22 +793,22 @@ void drawChar(char test, float x, float y, float size)
 		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x + size / 4.0f, y - size / 2.0f, x - size / 4.0f, y + size / 2.0f);
 		break;
-	case 0:
+	case '0':
 		for (int i = 0; i < 360; i += 10)
 			sfw::drawLine(x + cos(i*toRad)*size / 4.0f, y + sin(i*toRad)*size / 2.0f, x + cos((i + 10)*toRad)*size / 4.0f, y + sin((i + 10)*toRad)*size / 2.0f);
 		break;
-	case 1:
+	case '1':
 		sfw::drawLine(x, y - size / 2.0f, x, y + size / 2.0f);
 		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x, y - size / 2.0f, x - size / 4.0f, y - size / 4.0f);
 		break;
-	case 2:
+	case '2':
 		sfw::drawLine(x + size / 4.0f, y - size*3.0f / 8.0f, x - size / 4.0f, y + size / 2.0f);
 		sfw::drawLine(x + size / 4.0f, y + size / 2.0f, x - size / 4.0f, y + size / 2.0f);
 		for (int i = 0; i < 180; i += 10)
 			sfw::drawLine(x + cos(i*toRad)*size / 4.0f, y - size*3.0f / 8.0f - sin(i*toRad)*size / 8.0f, x + cos((i + 10)*toRad)*size / 4.0f, y - size*3.0f / 8.0f - sin((i + 10)*toRad)*size / 8.0f);
 		break;
-	case 3:
+	case '3':
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x, y - size / 2.0f);
 		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x, y + size / 2.0f);
 		for (int i = 0; i < 180; i += 10)
@@ -817,12 +817,12 @@ void drawChar(char test, float x, float y, float size)
 			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y - size / 4.0f + sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y - size / 4.0f + sin((i - 80)*toRad)*size / 4.0f);
 		}
 		break;
-	case 4:
+	case '4':
 		sfw::drawLine(x, y - size / 2.0f, x, y + size / 2.0f);
 		sfw::drawLine(x, y - size / 2.0f, x - size / 4.0f, y);
 		sfw::drawLine(x - size / 4.0f, y, x + size / 4.0f, y);
 		break;
-	case 5:
+	case '5':
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x - size / 4.0f, y);
 		sfw::drawLine(x - size / 4.0f, y, x, y);
@@ -830,22 +830,22 @@ void drawChar(char test, float x, float y, float size)
 		for (int i = 0; i < 180; i += 10)
 			sfw::drawLine(x + cos((i - 90)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 90)*toRad)*size / 4.0f, x + cos((i - 80)*toRad)*size / 4.0f, y + size / 4.0f + sin((i - 80)*toRad)*size / 4.0f);
 		break;
-	case 6:
+	case '6':
 		sfw::drawCircle(x, y + size / 4.0f, size / 4.0f);
 		sfw::drawLine(x - size / 4.0f, y - size / 4.0f, x - size / 4.0f, y + size / 4.0f);
 		sfw::drawLine(x, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
 		for (int i = 0; i < 90; i += 10)
 			sfw::drawLine(x + cos((i + 90)*toRad)*size / 4.0f, y - size / 4.0f - sin((i + 90)*toRad)*size / 4.0f, x + cos((i + 100)*toRad)*size / 4.0f, y - size / 4.0f - sin((i + 100)*toRad)*size / 4.0f);
 		break;
-	case 7:
+	case '7':
 		sfw::drawLine(x - size / 4.0f, y - size / 2.0f, x + size / 4.0f, y - size / 2.0f);
 		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x + size / 4.0f, y - size / 2.0f);
 		break;
-	case 8:
+	case '8':
 		sfw::drawCircle(x, y + size / 4.0f, size / 4.0f);
 		sfw::drawCircle(x, y - size / 4.0f, size / 4.0f);
 		break;
-	case 9:
+	case '9':
 		sfw::drawCircle(x, y - size / 4.0f, size / 4.0f);
 		sfw::drawLine(x + size / 4.0f, y + size / 4.0f, x + size / 4.0f, y - size / 4.0f);
 		sfw::drawLine(x - size / 4.0f, y + size / 2.0f, x, y + size / 2.0f);
@@ -863,7 +863,7 @@ void drawMenu(float screenH, float screenW,Player &selector,PowerUp pTypes[])
 	while (sfw::stepContext())
 	{
 		drawPaddle(selector);
-		for (int i = 0; i < 5; i++)
+		/*for (int i = 0; i < 5; i++)
 		{
 			pTypes[i].size = screenH / 28.0f;
 			pTypes[i].x = pTypes[i].size + 10.0f;
@@ -871,7 +871,8 @@ void drawMenu(float screenH, float screenW,Player &selector,PowerUp pTypes[])
 			pTypes[i].onScreen = true;
 			pTypes[i].effectDur = -1;
 			drawPowerup(pTypes[i]);
-		}
+		}*/
+
 		selector.aiTime--;
 		{
 			drawChar('I', pTypes[0].x + pTypes[0].size * 1.5f, pTypes[0].y, pTypes[0].size);
@@ -925,12 +926,12 @@ void drawMenu(float screenH, float screenW,Player &selector,PowerUp pTypes[])
 		}
 
 		{
-			drawChar(1, screenW / 2.0f + 0.0f * (size / 2.0f + gap) + size / 2.0f, screenH / 2.0f, size);
+			drawChar('1', screenW / 2.0f + 0.0f * (size / 2.0f + gap) + size / 2.0f, screenH / 2.0f, size);
 			drawChar('P', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 2.0f, screenH / 2.0f, size);
 		}
 
 		{
-			drawChar(2, screenW / 2.0f + 0.0f * (size / 2.0f + gap) + size / 2.0f, screenH*2.0f / 3.0f, size);
+			drawChar('2', screenW / 2.0f + 0.0f * (size / 2.0f + gap) + size / 2.0f, screenH*2.0f / 3.0f, size);
 			drawChar('P', screenW / 2.0f + 1.0f * (size / 2.0f + gap) + size / 2.0f, screenH*2.0f / 3.0f, size);
 		}
 

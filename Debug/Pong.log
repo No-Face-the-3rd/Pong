@@ -1,4 +1,4 @@
-﻿Build started 9/21/2015 10:00:03 AM.
+﻿Build started 9/28/2015 9:29:53 AM.
      1>Project "C:\Users\jacob.dodson\documents\visual studio 2015\Projects\Pong\Pong\Pong.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Source.cpp
@@ -30,4 +30,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.70
+Time Elapsed 00:00:00.29
